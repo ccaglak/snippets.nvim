@@ -31,7 +31,7 @@ Snippets are defined in JSON files. Each snippet is defined as a JSON object wit
   }
 }
 ```
-assumes <filetype>.json located in nvim config snippets folder.
+assumes filetype.json located in nvim config snippets folder.
 
 ```lua vim.fn.stdpath('config') .. '/snippets/' ```
 
