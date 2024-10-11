@@ -122,20 +122,21 @@ local function completion_intercept(client, method_cb_map)
   end
 end
 
-vim.api.nvim_create_autocmd('LspAttach', {
-  callback = function(args)
-    local client = vim.lsp.get_client_by_id(args.data.client_id)
-    completion_intercept(client, {
-      ["textDocument/completion"] = function(result)
-        local items = result.items or result
-        vim.list_extend(items, completion(items, vim.bo[args.buf].filetype))
-        -- if result.isIncomplete then
-        --   score = 0
-        -- end
-        return true
-      end,
-    })
-  end,
-})
-
+if #snippet_cache ~= 0 then
+  vim.api.nvim_create_autocmd('LspAttach', {
+    callback = function(args)
+      local client = vim.lsp.get_client_by_id(args.data.client_id)
+      completion_intercept(client, {
+        ["textDocument/completion"] = function(result)
+          local items = result.items or result
+          vim.list_extend(items, completion(items, vim.bo[args.buf].filetype))
+          if result.isIncomplete then -- still testing this
+            score = 0
+          end
+          return true
+        end,
+      })
+    end,
+  })
+end
 ------- 03
