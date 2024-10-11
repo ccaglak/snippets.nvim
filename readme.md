@@ -1,4 +1,4 @@
-# snippet.nvim
+# snippets.nvim
 
 A lightweight and efficient snippet expansion plugin for Neovim using native neovim snippet features.
 
@@ -14,7 +14,7 @@ A lightweight and efficient snippet expansion plugin for Neovim using native neo
 Using your preferred plugin manager, add the following:
 
 ```lua
-{'ccaglak/snippet.nvim'}
+{'ccaglak/snippets.nvim'}
 ```
 
 # Usage
