@@ -1,6 +1,6 @@
 # snippet.nvim
 
-A lightweight and efficient snippet expansion plugin for Neovim using native plugin neovim snippet features.
+A lightweight and efficient snippet expansion plugin for Neovim using native neovim snippet features.
 
 ## Features
 
