@@ -32,9 +32,9 @@ local function get_word_before_cursor()
   return line:sub(1, col):match("%w+$") or ""
 end
 
-local score = 0
 -- a better fuzzy maybe even something else
 local function fuzzy_match(str, pattern)
+  local score = 0
   local str_lower = str:lower()
   local pattern_lower = pattern:lower()
   local j = 1
@@ -60,7 +60,7 @@ local function expand_variables(body)
     CURRENT_DATE = os.date("%d"),
   }
 
-  return body:gsub("($?)%${?([%a_][%w_]*):?[^}]*}?", function(escape, var)
+  return body:gsub("($?)%${([%a_][%w_]*)}", function(escape, var)
     if escape == "$" then
       return "$" .. var
     else
@@ -77,7 +77,7 @@ local function completion(items, filetype)
 
   local snippets = vim.tbl_map(function(snippet)
     local body = type(snippet.body) == "table" and table.concat(snippet.body, "\n") or snippet.body
-    -- body = expand_variables(body)
+    body = expand_variables(body)
     return {
       label = snippet.prefix,
       kind = vim.lsp.protocol.CompletionItemKind.Snippet,
