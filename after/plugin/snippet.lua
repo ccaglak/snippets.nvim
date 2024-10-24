@@ -60,7 +60,7 @@ local function expand_variables(body)
     CURRENT_DATE = os.date("%d"),
   }
 
-  return body:gsub("($?)%${([%a_][%w_]*)}", function(escape, var)
+  return body:gsub("($?)%${([^:}]+)}", function(escape, var)
     if escape == "$" then
       return "$" .. var
     else
