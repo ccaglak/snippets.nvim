@@ -77,7 +77,7 @@ local function completion(items, filetype)
 
   local snippets = vim.tbl_map(function(snippet)
     local body = type(snippet.body) == "table" and table.concat(snippet.body, "\n") or snippet.body
-    body = expand_variables(body)
+    -- body = expand_variables(body)
     return {
       label = snippet.prefix,
       kind = vim.lsp.protocol.CompletionItemKind.Snippet,
