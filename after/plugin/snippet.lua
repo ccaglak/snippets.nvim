@@ -29,8 +29,12 @@ end
 local function get_word_before_cursor()
   local line = vim.api.nvim_get_current_line()
   local col = vim.api.nvim_win_get_cursor(0)[2]
+  if col == 0 then
+    return ""
+  end
   return line:sub(1, col):match("%w+$") or ""
 end
+
 
 -- a better fuzzy maybe even something else
 local function fuzzy_match(str, pattern)
