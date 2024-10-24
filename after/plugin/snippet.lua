@@ -70,6 +70,11 @@ local function expand_variables(body)
 end
 
 local function completion(items, filetype)
+  local existing_labels = {}
+  for _, item in ipairs(items) do
+    existing_labels[item.label] = true
+  end
+
   local snippets = vim.tbl_map(function(snippet)
     local body = type(snippet.body) == "table" and table.concat(snippet.body, "\n") or snippet.body
     body = expand_variables(body)
@@ -93,16 +98,23 @@ local function completion(items, filetype)
 
   local word = get_word_before_cursor()
   local snip = vim.tbl_filter(function(snippet)
-    local score = fuzzy_match(snippet.label, word)
+    if existing_labels[snippet.label] then
+      return false
+    end
+
+    score = fuzzy_match(snippet.label, word)
     if score > 0 then
       snippet.score = tostring(score)
+      existing_labels[snippet.label] = true
       return true
     end
     return false
   end, snippets)
 
-  return snip
+  items = vim.list_extend(items, snip)
 end
+
+
 
 local function completion_intercept(client, method_cb_map)
   local orig_rpc_request = client.rpc.request
@@ -129,7 +141,7 @@ if snippet_cache ~= {} then
       completion_intercept(client, {
         ["textDocument/completion"] = function(result)
           local items = result.items or result
-          vim.list_extend(items, completion(items, vim.bo[args.buf].filetype))
+          items = completion(items, vim.bo[args.buf].filetype)
           if result.isIncomplete then -- still testing this
             score = 0
           end
