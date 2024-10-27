@@ -29,8 +29,14 @@ end
 local function get_word_before_cursor()
   local line = vim.api.nvim_get_current_line()
   local col = vim.api.nvim_win_get_cursor(0)[2]
+
+  if col <= 0 then return "" end
+  if col > #line then col = #line end
+
   return line:sub(1, col):match("%w+$") or ""
 end
+
+
 
 -- a better fuzzy maybe even something else
 local function fuzzy_match(str, pattern)
@@ -70,19 +76,38 @@ local function expand_variables(body)
 end
 
 local function completion(items, filetype)
+  if not items then
+    return {}
+  end
+
   local existing_labels = {}
   for _, item in ipairs(items) do
     existing_labels[item.label] = true
   end
 
+  local word = get_word_before_cursor()
+
   local snippets = vim.tbl_map(function(snippet)
     local body = type(snippet.body) == "table" and table.concat(snippet.body, "\n") or snippet.body
     body = expand_variables(body)
+
+    -- Get current position for textEdit
+    local row = vim.api.nvim_win_get_cursor(0)[1] - 1
+    local col = vim.api.nvim_win_get_cursor(0)[2]
+    local start_col = col - #word
+
     return {
       label = snippet.prefix,
       kind = vim.lsp.protocol.CompletionItemKind.Snippet,
       insertTextFormat = vim.lsp.protocol.InsertTextFormat.Snippet,
       insertText = body,
+      textEdit = {
+        range = {
+          start = { line = row, character = start_col },
+          ["end"] = { line = row, character = col }
+        },
+        newText = body
+      },
       documentation = {
         kind = "markdown",
         value = ""
@@ -96,7 +121,6 @@ local function completion(items, filetype)
     }
   end, json_read(filetype) or {})
 
-  local word = get_word_before_cursor()
   local snip = vim.tbl_filter(function(snippet)
     if existing_labels[snippet.label] then
       return false
