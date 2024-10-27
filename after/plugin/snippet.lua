@@ -1,4 +1,4 @@
-local SNIPPET_DIR = vim.fn.stdpath('config') .. '/snippets/'
+local SNIPPET_DIR = vim.fn.stdpath("config") .. "/snippets/"
 local snippet_cache = {}
 
 local function json_read(filetype)
@@ -27,16 +27,8 @@ local function json_read(filetype)
 end
 
 local function get_word_before_cursor()
-  local line = vim.api.nvim_get_current_line()
-  local col = vim.api.nvim_win_get_cursor(0)[2]
-
-  if col <= 0 then return "" end
-  if col > #line then col = #line end
-
-  return line:sub(1, col):match("%w+$") or ""
+  return vim.api.nvim_get_current_line():sub(1, vim.fn.col(".") - 1):match("%a+$")
 end
-
-
 
 -- a better fuzzy maybe even something else
 local function fuzzy_match(str, pattern)
@@ -47,13 +39,14 @@ local function fuzzy_match(str, pattern)
   for i = 1, #pattern_lower do
     local char = pattern_lower:sub(i, i)
     local found = str_lower:find(char, j, true)
-    if not found then return 0 end
+    if not found then
+      return 0
+    end
     score = score + 1 / (found - j + 1)
     j = found + 1
   end
   return score
 end
-
 
 local function expand_variables(body)
   local variables = {
@@ -76,50 +69,33 @@ local function expand_variables(body)
 end
 
 local function completion(items, filetype)
-  if not items then
-    return {}
-  end
-
   local existing_labels = {}
   for _, item in ipairs(items) do
     existing_labels[item.label] = true
   end
 
-  local word = get_word_before_cursor()
-
   local snippets = vim.tbl_map(function(snippet)
     local body = type(snippet.body) == "table" and table.concat(snippet.body, "\n") or snippet.body
     body = expand_variables(body)
-
-    -- Get current position for textEdit
-    local row = vim.api.nvim_win_get_cursor(0)[1] - 1
-    local col = vim.api.nvim_win_get_cursor(0)[2]
-    local start_col = col - #word
-
     return {
       label = snippet.prefix,
       kind = vim.lsp.protocol.CompletionItemKind.Snippet,
       insertTextFormat = vim.lsp.protocol.InsertTextFormat.Snippet,
       insertText = body,
-      textEdit = {
-        range = {
-          start = { line = row, character = start_col },
-          ["end"] = { line = row, character = col }
-        },
-        newText = body
-      },
       documentation = {
         kind = "markdown",
-        value = ""
+        value = "",
       },
       data = {
         prefix = snippet.prefix,
         body = body,
-        filetype = filetype
+        filetype = filetype,
       },
       sortText = "0" .. string.format("%05d", snippet.priority or 500) .. snippet.prefix,
     }
   end, json_read(filetype) or {})
+
+  local word = get_word_before_cursor()
 
   local snip = vim.tbl_filter(function(snippet)
     if existing_labels[snippet.label] then
@@ -137,8 +113,6 @@ local function completion(items, filetype)
 
   return vim.list_extend(items, snip)
 end
-
-
 
 local function completion_intercept(client, method_cb_map)
   local orig_rpc_request = client.rpc.request
@@ -159,7 +133,7 @@ local function completion_intercept(client, method_cb_map)
 end
 
 if snippet_cache ~= {} then
-  vim.api.nvim_create_autocmd('LspAttach', {
+  vim.api.nvim_create_autocmd("LspAttach", {
     callback = function(args)
       local client = vim.lsp.get_client_by_id(args.data.client_id)
       completion_intercept(client, {
