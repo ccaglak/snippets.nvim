@@ -92,7 +92,7 @@ local function completion(items, filetype)
         body = body,
         filetype = filetype
       },
-      sortText = "0" .. string.format("%05d", snippet.priority or 100) .. snippet.prefix,
+      sortText = "0" .. string.format("%05d", snippet.priority or 500) .. snippet.prefix,
     }
   end, json_read(filetype) or {})
 
@@ -111,7 +111,7 @@ local function completion(items, filetype)
     return false
   end, snippets)
 
-  items = vim.list_extend(items, snip)
+  return vim.list_extend(items, snip)
 end
 
 
@@ -142,9 +142,9 @@ if snippet_cache ~= {} then
         ["textDocument/completion"] = function(result)
           local items = result.items or result
           items = completion(items, vim.bo[args.buf].filetype)
-          if result.isIncomplete then -- still testing this
-            score = 0
-          end
+          -- if result.isIncomplete then -- still testing this
+          --   score = 0
+          -- end
           return true
         end,
       })
