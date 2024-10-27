@@ -22,6 +22,7 @@ Snippets will automatically be suggested in the completion menu when typing. The
 
 # Snippet Format
 Snippets are defined in JSON files. Each snippet is defined as a JSON object with the following structure:
+snippet prefix should be alpha or alphanumeric otherwise it causes an error.
 ```json
 {
   "Console Log": {

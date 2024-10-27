@@ -30,6 +30,7 @@ local function get_word_before_cursor()
   return vim.api.nvim_get_current_line():sub(1, vim.fn.col(".") - 1):match("%a+$")
 end
 
+
 -- a better fuzzy maybe even something else
 local function fuzzy_match(str, pattern)
   local score = 0
