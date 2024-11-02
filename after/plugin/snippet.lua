@@ -7,7 +7,7 @@ local function json_read(filetype)
   end
 
   local file_path = SNIPPET_DIR .. filetype .. ".json"
-  local stat = vim.loop.fs_stat(file_path)
+  local stat = vim.uv.fs_stat(file_path)
   if not stat then
     return nil
   end
@@ -33,6 +33,9 @@ end
 
 -- a better fuzzy maybe even something else
 local function fuzzy_match(str, pattern)
+  if not pattern then
+    return 0
+  end
   local score = 0
   local str_lower = str:lower()
   local pattern_lower = pattern:lower()
@@ -48,6 +51,7 @@ local function fuzzy_match(str, pattern)
   end
   return score
 end
+
 
 local function expand_variables(body)
   local variables = {
@@ -104,8 +108,8 @@ local function completion(items, filetype)
     end
 
     local score = fuzzy_match(snippet.label, word)
-    if score > 0 then
-      snippet.score = tostring(score)
+    if score >= 2 then
+      snippet.score = tostring(score * 1000)
       existing_labels[snippet.label] = true
       return true
     end
