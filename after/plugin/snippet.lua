@@ -74,6 +74,10 @@ local function expand_variables(body)
 end
 
 local function completion(items, filetype)
+  if not vim.api.nvim_buf_is_valid(vim.api.nvim_get_current_buf()) then
+    return items
+  end
+
   local existing_labels = {}
   for _, item in ipairs(items) do
     existing_labels[item.label] = true
