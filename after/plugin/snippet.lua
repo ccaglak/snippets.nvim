@@ -27,7 +27,7 @@ local function json_read(filetype)
 end
 
 local function get_word_before_cursor()
-  return vim.api.nvim_get_current_line():sub(1, vim.fn.col(".") - 1):match("%a+$")
+  return vim.api.nvim_get_current_line():sub(1, vim.fn.col(".") - 1):match("[%a_]+$") or ""
 end
 
 local function expand_variables(body)
@@ -87,7 +87,7 @@ local function completion(items, filetype, bufnr)
     if existing_labels[snippet.label] then
       return false
     end
-    return snippet.label:sub(1, #word) == word
+    return word == "" or snippet.label:sub(1, #word) == word
   end, snippets)
 
   return vim.list_extend(items, snip)
