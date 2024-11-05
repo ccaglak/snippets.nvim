@@ -52,7 +52,6 @@ end
 
 local function completion(items, filetype, bufnr)
   if not vim.api.nvim_buf_is_valid(bufnr) then
-    print("Buffer is not valid")
     return items
   end
 
