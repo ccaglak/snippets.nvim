@@ -1,4 +1,4 @@
-# snippets.nvim -- unstable
+# snippets.nvim
 
 A lightweight and efficient snippet expansion plugin for Neovim using native neovim snippet features.
 
