@@ -115,21 +115,24 @@ vim.api.nvim_create_autocmd("LspAttach", {
   callback = function(args)
     local bufnr = args.buf
     local filetype = vim.bo[bufnr].filetype
+    local client = vim.lsp.get_client_by_id(args.data.client_id)
 
     if initialized_filetypes[filetype] then
       return
     end
 
-    local client = vim.lsp.get_client_by_id(args.data.client_id)
-    completion_intercept(client, {
-      ["textDocument/completion"] = function(result)
-        local items = result.items or result
-        items = completion(items, filetype, bufnr)
-        return true
-      end,
-    })
+    -- Only intercept PHP LSP clients
+    if client.name == "intelephense" or client.name == "phpactor" then
+      completion_intercept(client, {
+        ["textDocument/completion"] = function(result)
+          local items = result.items or result
+          items = completion(items, filetype, bufnr)
+          return true
+        end,
+      })
 
-    initialized_filetypes[filetype] = true
+      initialized_filetypes[filetype] = true
+    end
   end,
 })
 
