@@ -30,29 +30,6 @@ local function get_word_before_cursor()
   return vim.api.nvim_get_current_line():sub(1, vim.fn.col(".") - 1):match("%a+$")
 end
 
-
--- a better fuzzy maybe even something else
-local function fuzzy_match(str, pattern)
-  if not pattern then
-    return 0
-  end
-  local score = 0
-  local str_lower = str:lower()
-  local pattern_lower = pattern:lower()
-  local j = 1
-  for i = 1, #pattern_lower do
-    local char = pattern_lower:sub(i, i)
-    local found = str_lower:find(char, j, true)
-    if not found then
-      return 0
-    end
-    score = score + 1 / (found - j + 1)
-    j = found + 1
-  end
-  return score
-end
-
-
 local function expand_variables(body)
   local variables = {
     TM_FILENAME = vim.fn.expand("%:t"),
@@ -106,19 +83,11 @@ local function completion(items, filetype, bufnr)
   end, json_read(filetype) or {})
 
   local word = get_word_before_cursor()
-
   local snip = vim.tbl_filter(function(snippet)
     if existing_labels[snippet.label] then
       return false
     end
-
-    local score = fuzzy_match(snippet.label, word)
-    if score >= 2 then
-      snippet.score = tostring(score * 1000)
-      existing_labels[snippet.label] = true
-      return true
-    end
-    return false
+    return snippet.label:sub(1, #word) == word
   end, snippets)
 
   return vim.list_extend(items, snip)
@@ -164,4 +133,5 @@ vim.api.nvim_create_autocmd("LspAttach", {
     initialized_filetypes[filetype] = true
   end,
 })
+
 ------- 03
