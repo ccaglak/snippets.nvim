@@ -73,8 +73,8 @@ local function expand_variables(body)
   end)
 end
 
-local function completion(items, filetype)
-  if not vim.api.nvim_buf_is_valid(vim.api.nvim_get_current_buf()) then
+local function completion(items, filetype, bufnr)
+  if not vim.api.nvim_buf_is_valid(bufnr) then
     return items
   end
 
@@ -144,11 +144,12 @@ end
 if snippet_cache ~= {} then
   vim.api.nvim_create_autocmd("LspAttach", {
     callback = function(args)
+      local bufnr = args.buf
       local client = vim.lsp.get_client_by_id(args.data.client_id)
       completion_intercept(client, {
         ["textDocument/completion"] = function(result)
           local items = result.items or result
-          items = completion(items, vim.bo[args.buf].filetype)
+          items = completion(items, vim.bo[bufnr].filetype, bufnr)
           -- if result.isIncomplete then -- still testing this
           --   score = 0
           -- end
@@ -156,6 +157,7 @@ if snippet_cache ~= {} then
         end,
       })
     end,
+    once = true,
   })
 end
 ------- 03
