@@ -120,7 +120,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
       return
     end
 
-    -- Only intercept PHP LSP clients
     completion_intercept(client, {
       ["textDocument/completion"] = function(result)
         local items = result.items or result
