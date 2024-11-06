@@ -107,9 +107,16 @@ vim.api.nvim_create_autocmd("LspAttach", {
   callback = function(args)
     local bufnr = args.buf
     local filetype = vim.bo[bufnr].filetype
-    local client = vim.lsp.get_client_by_id(args.data.client_id)
-
     if initialized_filetypes[filetype] then
+      return
+    end
+    local file_path = SNIPPET_DIR .. filetype .. ".json"
+    local stat = vim.uv.fs_stat(file_path)
+    if not stat then
+      return
+    end
+    local client = vim.lsp.get_client_by_id(args.data.client_id)
+    if client.name == "laravells" then
       return
     end
 
