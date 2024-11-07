@@ -55,6 +55,11 @@ local function completion(items, filetype, bufnr)
     return items
   end
 
+  local existing_labels = {}
+  for _, item in ipairs(items) do
+    existing_labels[item.label] = true
+  end
+
   local snippets = vim.tbl_map(function(snippet)
     local body = type(snippet.body) == "table" and table.concat(snippet.body, "\n") or snippet.body
     body = expand_variables(body)
@@ -78,6 +83,9 @@ local function completion(items, filetype, bufnr)
 
   local word = get_word_before_cursor()
   local snip = vim.tbl_filter(function(snippet)
+    if existing_labels[snippet.label] then
+      return false
+    end
     return word == "" or snippet.label:sub(1, #word) == word
   end, snippets)
 
