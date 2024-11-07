@@ -1,4 +1,4 @@
-# snippets.nvim
+# snippets.nvim -- 100 loc snippet plugin for neovim
 
 A lightweight and efficient snippet expansion plugin for Neovim using native neovim snippet features.
 
@@ -49,8 +49,6 @@ The plugin supports various built-in variables for snippet expansion:
 
 # Contributing
 Contributions are welcome! Please feel free to submit a Pull Request.
-
-# Special thanks to L3MON4D3
 
 # License
 This project is licensed under the MIT License.
