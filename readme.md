@@ -49,5 +49,10 @@ The plugin supports various built-in variables for snippet expansion:
 # Contributing
 Contributions are welcome! Please feel free to submit a Pull Request.
 
+
+## Self Promotion
+
+- [Condo Painters Pro](https://www.condopainterspro.ca)
+
 # License
 This project is licensed under the MIT License.
